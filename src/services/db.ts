@@ -10,13 +10,23 @@ import type { Directory, Template, TelegramUser, User } from '../types';
  */
 export class DatabaseService {
   /** Ensures there is an authenticated Supabase user (anonymous in dev). */
-  static async ensureSignedIn(): Promise<string> {
-    const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
-    if (sessionErr) throw sessionErr;
+    static async ensureSignedIn() {
+      const { data: s1 } = await supabase.auth.getSession();
+      console.log("session before signIn:", s1.session);
 
-    if (sessionData.session?.user?.id) {
-      return sessionData.session.user.id;
+      if (s1.session) return;
+
+      const { data: signData, error: signErr } = await supabase.auth.signInAnonymously();
+      console.log("signInAnonymously result:", signData, "error:", signErr);
+
+      const { data: s2, error: s2e } = await supabase.auth.getSession();
+      console.log("session after signIn:", s2.session, "error:", s2e);
+
+      if (!s2.session) {
+        throw new Error("Failed to create session via signInAnonymously()");
+      }
     }
+  }
 
     // Anonymous sign-in enables RLS policies that rely on auth.uid().
     const { data, error } = await supabase.auth.signInAnonymously();
