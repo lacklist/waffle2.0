@@ -16,7 +16,7 @@ export class DatabaseService {
 
     if (sessionData.session?.user?.id) {
       return sessionData.session.user.id;
-    } 
+    }
 
     // Anonymous sign-in enables RLS policies that rely on auth.uid().
     const { data, error } = await supabase.auth.signInAnonymously();
